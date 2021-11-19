@@ -1,11 +1,6 @@
-## My Project
+## AWS IoT ExpressLink Examples
 
-TODO: Fill this README out!
-
-Be sure to:
-
-* Change the title in this README
-* Edit your repository description on GitHub
+This repo contains examples for integrating an AWS IoT ExpressLink module into an application.  These examples are intended to demonstrate how to perform the common operations for an IoT device.
 
 ## Security
 
