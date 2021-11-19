@@ -3,8 +3,9 @@
 
 TMP102 sensor0;
 
-#define HIGH_TEMPERATURE 27.0
+#define HIGH_TEMPERATURE 28.0
 #define LOW_TEMPERATURE 26.0
+const int SamplePeriod_ms = 5000;
 
 // Helpers for ExpressLink command processing
 
@@ -17,6 +18,12 @@ typedef enum response_codes
   EL_MODE_NOT_AVAILABLE, EL_ACTIVE_CONNECTION, EL_HOST_IMAGE_NOT_AVAILABLE, EL_INVALID_ADDRESS,
   EL_INVALID_OTA_UPDATE, EL_INVALID_QUERY, EL_INVALID_SIGNATURE
 }response_codes_t;
+
+typedef enum alarm_s
+{
+  AL_NONE, AL_HIGH, AL_LOW, AL_OK
+} alarm_t;
+const char *alarmStrings[] = {"", "HIGH", "LOW","OK" };
 
 #define expresslink_com Serial1
 
@@ -35,12 +42,6 @@ response_codes_t checkResponse(String response)
   int errPosition = response.indexOf("ERR");
   response_codes_t errCode =  (response_codes_t) response.substring(3).toInt();
   return errCode;
-}
-
-// break out message after the OK/ERR# response
-String getPayload(String response)
-{
-  
 }
 
 void expressLinkConnect()
@@ -97,49 +98,59 @@ void setup() {
 
 }
 
+float collectData()
+{
+  sensor0.wakeup();
+  float temperature = sensor0.readTempC();
+  sensor0.sleep();
+  return temperature;
+}
+
+alarm_t checkAlarm(float data, float high_limit, float low_limit)
+{
+  static alarm_t alarm_pv = AL_NONE;
+  alarm_t alarm_value = AL_NONE;
+  
+  if(data > high_limit)
+  {
+    alarm_value = AL_HIGH;
+  }
+  else if(data < low_limit)
+  {
+    alarm_value = AL_LOW;
+  }
+  else if(alarm_pv != AL_NONE)
+  {
+    alarm_value = AL_OK;
+  }
+  alarm_pv = alarm_value;
+  return alarm_value;
+}
+
 void loop() {
 
   static int lastSampleTime_ms = 0;
   static bool alert_pv = false;
-  const int SamplePeriod_ms = 5000;
+  String alarmString = "";
+  alarm_t alarm;
   int now = millis();
 
   if( (now - SamplePeriod_ms) >= lastSampleTime_ms)
   {
     lastSampleTime_ms = now;
+    
     expressLinkConnect(); // ensure we are still connected to the cloud
 
-    sensor0.wakeup();
-    float temperature = sensor0.readTempC();
-    sensor0.sleep();
-
-    SerialUSB.print("Temperature : ");
-    SerialUSB.print(temperature);
+    float temperature = collectData();
+    alarm = checkAlarm(temperature, HIGH_TEMPERATURE, LOW_TEMPERATURE);
+    
     SendCommand("AT+SEND1 "+String(temperature));
-    if(temperature > HIGH_TEMPERATURE)
+    if(alarm != AL_NONE)
     {
-      SerialUSB.println("  high alarm");
-      alert_pv = true;
-      SendCommand("AT+SEND2 {\"alarm\":\"HIGH\"}");
+      SendCommand("AT+SEND2 {\"alarm\":\"" + String(alarmStrings[alarm]) + "\"}");
+      alarmString = " - alarm : " + String(alarmStrings[alarm]);
     }
-    else if(temperature < LOW_TEMPERATURE)
-    {
-      SerialUSB.println("  low alarm");
-      alert_pv = true;
-      SendCommand("AT+SEND2 {\"alarm\":\"LOW\"}");
-    }
-    else
-    {
-      if(alert_pv)
-      {
-        SerialUSB.println("  alarm OK");
-        SendCommand("AT+SEND2 {\"alarm\":\"OK\"}");
-        alert_pv = false;
-      }
-      else
-      {
-        SerialUSB.println("");
-      }
-    }
+    
+    SerialUSB.println("Temperature : " + String(temperature) + alarmString);
   }
 }
