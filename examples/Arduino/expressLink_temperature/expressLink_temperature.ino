@@ -1,3 +1,5 @@
+
+
 #include <Wire.h>
 #include <SparkFunTMP102.h>
 
@@ -90,7 +92,6 @@ void setup() {
 
   expresslink_com.begin(115200);
 
-  SendCommand("AT+CONF TopicRoot=ExpressLink_2021");
   SendCommand("AT+CONF Topic1=temperature");
   SendCommand("AT+CONF Topic2=alarm");
 
