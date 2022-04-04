@@ -78,8 +78,7 @@ void loop()
      
     JSONVar dataReport;
 
-    dataReport["room"] = "office";
-    dataReport["owner"] = "joe";
+    dataReport["room"] = "Tucson office";
     dataReport["device_id"] = thingname;
     dataReport["temperature"] = temperature;
     dataReport["voc"] = sensor1.TVOC;
