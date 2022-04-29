@@ -87,7 +87,7 @@ wind.reset()
 
 response = el.sendCommand('AT+CONF? ThingName')
 thingName = response[3:]
-response = el.sendCommand("AT+CONF Topic1=weather/sensor/" + thingName)
+response = el.sendCommand("AT+CONF Topic1=/weather/sensor/" + thingName)
 
 while True:
 
