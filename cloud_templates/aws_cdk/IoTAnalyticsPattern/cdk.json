@@ -34,11 +34,16 @@
       "aws",
       "aws-cn"
     ],
-    "topic_sql": "SELECT * FROM 'Timestream_demo'",
-    "dimensions": ["Location"],
-    "timestream_db_name": "demo_db",
-    "timestream_table_name": "demo_table",
-    "timestream_iot_role_name": "demo_iot_timestream_role",
-    "timestream_iot_rule_name": "demo_to_timetream_rule"
+    "topic_sql": "SELECT *, parse_time(\"YYYY-MM-dd'T'hh:mm:ss\", timestamp()) as Time FROM 'IoT_Analytics_demo'",
+    "analytics_channel_name": "demo_iot_channel",
+    "analytics_datastore_name": "demo_iot_datastore",
+    "analytics_dataset_name": "demo_iot_dataset",
+    "analytics_pipeline_name": "demo_iot_pipeline",
+    "analytics_iot_role_name": "demo_iot_iotanalytics_role",
+    "analytics_iot_rule_name": "demo_to_iotanalytics_rule",
+    "channel_storage_type": "service_managed",
+    "datastore_storage_type": "service_managed",
+    "file_format_configuration": "json",
+    "parquet_file_format_schema_columns" : [{"name": "device_id", "type": "string"}]
   }
 }

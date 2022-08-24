@@ -1,36 +1,80 @@
 {
  "Resources": {
-  "demodb": {
-   "Type": "AWS::Timestream::Database",
+  "demoiotchannel": {
+   "Type": "AWS::IoTAnalytics::Channel",
    "Properties": {
-    "DatabaseName": "demo_db"
+    "ChannelName": "demo_iot_channel"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "TimestreamPatternStack/demo_db"
+    "aws:cdk:path": "IoTAnalyticsPatternStack/demo_iot_channel"
    }
   },
-  "demotable": {
-   "Type": "AWS::Timestream::Table",
+  "demoiotdatastore": {
+   "Type": "AWS::IoTAnalytics::Datastore",
    "Properties": {
-    "DatabaseName": "demo_db",
-    "RetentionProperties": {
-     "MemoryStoreRetentionPeriodInHours": "24",
-     "MagneticStoreRetentionPeriodInDays": "7"
-    },
-    "TableName": "demo_table"
+    "DatastoreName": "demo_iot_datastore",
+    "DatastoreStorage": {
+     "ServiceManagedS3": {}
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "IoTAnalyticsPatternStack/demo_iot_datastore"
+   }
+  },
+  "demoiotdataset": {
+   "Type": "AWS::IoTAnalytics::Dataset",
+   "Properties": {
+    "Actions": [
+     {
+      "ActionName": "QueryDatastoreCDK",
+      "QueryAction": {
+       "SqlQuery": "SELECT * FROM demo_iot_datastore"
+      }
+     }
+    ]
    },
    "DependsOn": [
-    "demodb"
+    "demoiotdatastore"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "TimestreamPatternStack/demo_table"
+    "aws:cdk:path": "IoTAnalyticsPatternStack/demo_iot_dataset"
    }
   },
-  "demoiottimestreamrole59095436": {
+  "demoiotpipeline": {
+   "Type": "AWS::IoTAnalytics::Pipeline",
+   "Properties": {
+    "PipelineActivities": [
+     {
+      "Channel": {
+       "ChannelName": "demo_iot_channel",
+       "Name": "demo_iot_channel",
+       "Next": "demo_iot_datastore"
+      },
+      "Datastore": {
+       "DatastoreName": "demo_iot_datastore",
+       "Name": "demo_iot_datastore"
+      }
+     }
+    ],
+    "PipelineName": "demo_iot_pipeline"
+   },
+   "DependsOn": [
+    "demoiotchannel",
+    "demoiotdatastore"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "IoTAnalyticsPatternStack/demo_iot_pipeline"
+   }
+  },
+  "demoiotiotanalyticsroleB60804E3": {
    "Type": "AWS::IAM::Role",
    "Properties": {
     "AssumeRolePolicyDocument": {
@@ -47,64 +91,69 @@
     }
    },
    "DependsOn": [
-    "demotable"
+    "demoiotchannel"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "TimestreamPatternStack/demo_iot_timestream_role/Resource"
+    "aws:cdk:path": "IoTAnalyticsPatternStack/demo_iot_iotanalytics_role/Resource"
    }
   },
-  "demoiottimestreamroleDefaultPolicy6B3D586D": {
+  "demoiotiotanalyticsroleDefaultPolicy5B5688F1": {
    "Type": "AWS::IAM::Policy",
    "Properties": {
     "PolicyDocument": {
      "Statement": [
       {
-       "Action": "timestream:WriteRecords",
+       "Action": "iotanalytics:BatchPutMessage",
        "Effect": "Allow",
        "Resource": {
-        "Fn::GetAtt": [
-         "demotable",
-         "Arn"
+        "Fn::Join": [
+         "",
+         [
+          "arn:aws:iotanalytics:",
+          {
+           "Ref": "AWS::Region"
+          },
+          ":",
+          {
+           "Ref": "AWS::AccountId"
+          },
+          ":channel/demo_iot_channel"
+         ]
         ]
        }
-      },
-      {
-       "Action": "timestream:DescribeEndpoints",
-       "Effect": "Allow",
-       "Resource": "*"
       }
      ],
      "Version": "2012-10-17"
     },
-    "PolicyName": "demoiottimestreamroleDefaultPolicy6B3D586D",
+    "PolicyName": "demoiotiotanalyticsroleDefaultPolicy5B5688F1",
     "Roles": [
      {
-      "Ref": "demoiottimestreamrole59095436"
+      "Ref": "demoiotiotanalyticsroleB60804E3"
      }
     ]
    },
    "DependsOn": [
-    "demotable"
+    "demoiotchannel"
    ],
    "Metadata": {
-    "aws:cdk:path": "TimestreamPatternStack/demo_iot_timestream_role/DefaultPolicy/Resource"
+    "aws:cdk:path": "IoTAnalyticsPatternStack/demo_iot_iotanalytics_role/DefaultPolicy/Resource"
    }
   },
-  "iottotimestreamloggroup28D0FCAA": {
+  "iottoanalyticsloggroup24354EF0": {
    "Type": "AWS::Logs::LogGroup",
    "Properties": {
-    "LogGroupName": "iot_to_timestream_log_group",
+    "LogGroupName": "iot_to_analytics_log_group",
     "RetentionInDays": 731
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "TimestreamPatternStack/iot_to_timestream_log_group/Resource"
+    "aws:cdk:path": "IoTAnalyticsPatternStack/iot_to_analytics_log_group/Resource"
    }
   },
-  "iottologgrouproleBE9DD4DE": {
+  "iottoanalyticsloggrouprole85868C50": {
    "Type": "AWS::IAM::Role",
    "Properties": {
     "AssumeRolePolicyDocument": {
@@ -121,15 +170,15 @@
     }
    },
    "DependsOn": [
-    "iottotimestreamloggroup28D0FCAA"
+    "iottoanalyticsloggroup24354EF0"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "TimestreamPatternStack/iot_to_log_group_role/Resource"
+    "aws:cdk:path": "IoTAnalyticsPatternStack/iot_to_analytics_log_group_role/Resource"
    }
   },
-  "iottologgrouproleDefaultPolicyFAF3C98E": {
+  "iottoanalyticsloggrouproleDefaultPolicy9740758A": {
    "Type": "AWS::IAM::Policy",
    "Properties": {
     "PolicyDocument": {
@@ -145,7 +194,7 @@
        "Effect": "Allow",
        "Resource": {
         "Fn::GetAtt": [
-         "iottotimestreamloggroup28D0FCAA",
+         "iottoanalyticsloggroup24354EF0",
          "Arn"
         ]
        }
@@ -153,79 +202,72 @@
      ],
      "Version": "2012-10-17"
     },
-    "PolicyName": "iottologgrouproleDefaultPolicyFAF3C98E",
+    "PolicyName": "iottoanalyticsloggrouproleDefaultPolicy9740758A",
     "Roles": [
      {
-      "Ref": "iottologgrouproleBE9DD4DE"
+      "Ref": "iottoanalyticsloggrouprole85868C50"
      }
     ]
    },
    "DependsOn": [
-    "iottotimestreamloggroup28D0FCAA"
+    "iottoanalyticsloggroup24354EF0"
    ],
    "Metadata": {
-    "aws:cdk:path": "TimestreamPatternStack/iot_to_log_group_role/DefaultPolicy/Resource"
+    "aws:cdk:path": "IoTAnalyticsPatternStack/iot_to_analytics_log_group_role/DefaultPolicy/Resource"
    }
   },
-  "demototimetreamrule": {
+  "demotoiotanalyticsrule": {
    "Type": "AWS::IoT::TopicRule",
    "Properties": {
     "TopicRulePayload": {
      "Actions": [
       {
-       "Timestream": {
-        "DatabaseName": "demo_db",
-        "Dimensions": [
-         {
-          "Name": "Location",
-          "Value": "${Location}"
-         }
-        ],
+       "IotAnalytics": {
+        "ChannelName": "demo_iot_channel",
         "RoleArn": {
          "Fn::GetAtt": [
-          "demoiottimestreamrole59095436",
+          "demoiotiotanalyticsroleB60804E3",
           "Arn"
          ]
-        },
-        "TableName": "demo_table"
+        }
        }
       }
      ],
+     "AwsIotSqlVersion": "2016-03-23",
      "ErrorAction": {
       "CloudwatchLogs": {
        "LogGroupName": {
-        "Ref": "iottotimestreamloggroup28D0FCAA"
+        "Ref": "iottoanalyticsloggroup24354EF0"
        },
        "RoleArn": {
         "Fn::GetAtt": [
-         "iottologgrouproleBE9DD4DE",
+         "iottoanalyticsloggrouprole85868C50",
          "Arn"
         ]
        }
       }
      },
-     "Sql": "SELECT * FROM 'Timestream_demo'"
+     "Sql": "SELECT *, parse_time(\"YYYY-MM-dd'T'hh:mm:ss\", timestamp()) as Time FROM 'IoT_Analytics_demo'"
     }
    },
    "DependsOn": [
-    "demodb",
-    "demoiottimestreamroleDefaultPolicy6B3D586D",
-    "demoiottimestreamrole59095436",
-    "demotable"
+    "demoiotchannel",
+    "demoiotiotanalyticsroleDefaultPolicy5B5688F1",
+    "demoiotiotanalyticsroleB60804E3"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "TimestreamPatternStack/demo_to_timetream_rule"
+    "aws:cdk:path": "IoTAnalyticsPatternStack/demo_to_iotanalytics_rule"
    }
   },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/zWOwQ6CMBBEv4V7WVEOfgAmXjwQ9G5KqbhSuqTdxpCGf5dCPM3sTPZlTlCWUGTy63PVDbnBFuKdpRrEGj0j46g9Oy1HiNXLXiTLVnotVv+QrdGLwFQ1ZLZs05oMqjmdu1uEod5DvFF/dRSm1Pz9+k8MiUYTqiYkYuJoT8GpjVmR7ZCR7CLqmd9kDyWc4VhkH4+Yu2DTRmh2/QGC7DCgzwAAAA=="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/z2MwQ6CMAyGn4X7qCgHHwATLx4IejdzTKiMlrASQwjv7pjRU7/+/fsdIM8hS/Tbp6buUocPWK6iTadCdF+QRZN2s6DxsBRPKlpNZJ0KeNKivfBo/4uVDUscrEOyq0Ldw1Kxi404S3Zo5tiKtCrHTTBfuDmPPA3b5cfhnwVCcOMBTTW5YNw81vM0mugsmGoUZFpVOUvLtMvhCPsseXnEdJxIsLdQfecHMGzhi+sAAAA="
    },
    "Metadata": {
-    "aws:cdk:path": "TimestreamPatternStack/CDKMetadata/Default"
+    "aws:cdk:path": "IoTAnalyticsPatternStack/CDKMetadata/Default"
    },
    "Condition": "CDKMetadataAvailable"
   }

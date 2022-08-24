@@ -2,11 +2,11 @@ import os
 
 import aws_cdk as cdk
 
-from timestream_pattern.timestream_pattern_stack import TimestreamPatternStack
+from io_t_analytics_pattern.io_t_analytics_pattern_stack import IoTAnalyticsPatternStack
 
 
 app = cdk.App()
-TimestreamPatternStack(app, "TimestreamPatternStack",
+IoTAnalyticsPatternStack(app, "IoTAnalyticsPatternStack",
     # If you don't specify 'env', this stack will be environment-agnostic.
     # Account/Region-dependent features and context lookups will not work,
     # but a single synthesized template can be deployed anywhere.
