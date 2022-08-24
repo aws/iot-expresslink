@@ -1,0 +1,462 @@
+{
+ "Resources": {
+  "demodb": {
+   "Type": "AWS::Timestream::Database",
+   "Properties": {
+    "DatabaseName": "demo_db"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "TimestreamPatternStack/demo_db"
+   }
+  },
+  "demotable": {
+   "Type": "AWS::Timestream::Table",
+   "Properties": {
+    "DatabaseName": "demo_db",
+    "RetentionProperties": {
+     "MemoryStoreRetentionPeriodInHours": "24",
+     "MagneticStoreRetentionPeriodInDays": "7"
+    },
+    "TableName": "demo_table"
+   },
+   "DependsOn": [
+    "demodb"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "TimestreamPatternStack/demo_table"
+   }
+  },
+  "demoiottimestreamrole59095436": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "iot.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "DependsOn": [
+    "demotable"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "TimestreamPatternStack/demo_iot_timestream_role/Resource"
+   }
+  },
+  "demoiottimestreamroleDefaultPolicy6B3D586D": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "timestream:WriteRecords",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "demotable",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": "timestream:DescribeEndpoints",
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "demoiottimestreamroleDefaultPolicy6B3D586D",
+    "Roles": [
+     {
+      "Ref": "demoiottimestreamrole59095436"
+     }
+    ]
+   },
+   "DependsOn": [
+    "demotable"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "TimestreamPatternStack/demo_iot_timestream_role/DefaultPolicy/Resource"
+   }
+  },
+  "iottotimestreamloggroup28D0FCAA": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "iot_to_timestream_log_group",
+    "RetentionInDays": 731
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "TimestreamPatternStack/iot_to_timestream_log_group/Resource"
+   }
+  },
+  "iottologgrouproleBE9DD4DE": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "iot.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "DependsOn": [
+    "iottotimestreamloggroup28D0FCAA"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "TimestreamPatternStack/iot_to_log_group_role/Resource"
+   }
+  },
+  "iottologgrouproleDefaultPolicyFAF3C98E": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:PutMetricFilter",
+        "logs:PutRetentionPolicy"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "iottotimestreamloggroup28D0FCAA",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "iottologgrouproleDefaultPolicyFAF3C98E",
+    "Roles": [
+     {
+      "Ref": "iottologgrouproleBE9DD4DE"
+     }
+    ]
+   },
+   "DependsOn": [
+    "iottotimestreamloggroup28D0FCAA"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "TimestreamPatternStack/iot_to_log_group_role/DefaultPolicy/Resource"
+   }
+  },
+  "demototimetreamrule": {
+   "Type": "AWS::IoT::TopicRule",
+   "Properties": {
+    "TopicRulePayload": {
+     "Actions": [
+      {
+       "Timestream": {
+        "DatabaseName": "demo_db",
+        "Dimensions": [
+         {
+          "Name": "Location",
+          "Value": "${Location}"
+         }
+        ],
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "demoiottimestreamrole59095436",
+          "Arn"
+         ]
+        },
+        "TableName": "demo_table"
+       }
+      }
+     ],
+     "ErrorAction": {
+      "CloudwatchLogs": {
+       "LogGroupName": {
+        "Ref": "iottotimestreamloggroup28D0FCAA"
+       },
+       "RoleArn": {
+        "Fn::GetAtt": [
+         "iottologgrouproleBE9DD4DE",
+         "Arn"
+        ]
+       }
+      }
+     },
+     "Sql": "SELECT * FROM 'Timestream_demo'"
+    }
+   },
+   "DependsOn": [
+    "demodb",
+    "demoiottimestreamroleDefaultPolicy6B3D586D",
+    "demoiottimestreamrole59095436",
+    "demotable"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "TimestreamPatternStack/demo_to_timetream_rule"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/zWOwQ6CMBBEv4V7WVEOfgAmXjwQ9G5KqbhSuqTdxpCGf5dCPM3sTPZlTlCWUGTy63PVDbnBFuKdpRrEGj0j46g9Oy1HiNXLXiTLVnotVv+QrdGLwFQ1ZLZs05oMqjmdu1uEod5DvFF/dRSm1Pz9+k8MiUYTqiYkYuJoT8GpjVmR7ZCR7CLqmd9kDyWc4VhkH4+Yu2DTRmh2/QGC7DCgzwAAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "TimestreamPatternStack/CDKMetadata/Default"
+   },
+   "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Conditions": {
+  "CDKMetadataAvailable": {
+   "Fn::Or": [
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "af-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-northwest-1"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "sa-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-2"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-2"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}
+
