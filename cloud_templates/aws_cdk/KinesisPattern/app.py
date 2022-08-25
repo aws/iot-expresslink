@@ -2,11 +2,11 @@ import os
 
 import aws_cdk as cdk
 
-from open_search_pattern.open_search_pattern_stack import OpenSearchPatternStack
+from kinesis_pattern.kinesis_pattern_stack import KinesisPatternStack
 
 
 app = cdk.App()
-OpenSearchPatternStack(app, "OpenSearchPatternStack",
+KinesisPatternStack(app, "KinesisPatternStack",
     # If you don't specify 'env', this stack will be environment-agnostic.
     # Account/Region-dependent features and context lookups will not work,
     # but a single synthesized template can be deployed anywhere.
