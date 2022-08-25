@@ -1,0 +1,1003 @@
+{
+ "Resources": {
+  "DemoIdentityPool": {
+   "Type": "AWS::Cognito::IdentityPool",
+   "Properties": {
+    "AllowUnauthenticatedIdentities": false
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/DemoIdentityPool"
+   }
+  },
+  "demoiotopensearchrole": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Effect": "Allow",
+       "Principal": {
+        "Federated": "cognito-identity.amazonaws.com"
+       },
+       "Action": "sts:AssumeRoleWithWebIdentity",
+       "Condition": {
+        "StringEquals": {
+         "cognito-identity.amazonaws.com:aud": {
+          "Ref": "DemoIdentityPool"
+         }
+        },
+        "ForAnyValue:StringLike": {
+         "cognito-identity.amazonaws.com:amr": "authenticated"
+        }
+       }
+      },
+      {
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "iot.amazonaws.com"
+       },
+       "Action": "sts:AssumeRole"
+      }
+     ]
+    },
+    "Policies": [
+     {
+      "PolicyDocument": {
+       "Version": "2012-10-17",
+       "Statement": [
+        {
+         "Action": "iotanalytics:BatchPutMessage",
+         "Resource": {
+          "Fn::Join": [
+           "",
+           [
+            "arn:aws:iotanalytics:",
+            {
+             "Ref": "AWS::Region"
+            },
+            ":",
+            {
+             "Ref": "AWS::AccountId"
+            },
+            ":domain/opensearch-demo-domain/*"
+           ]
+          ]
+         },
+         "Effect": "Allow"
+        }
+       ]
+      },
+      "PolicyName": "master_useriot_integration"
+     }
+    ]
+   },
+   "DependsOn": [
+    "DemoIdentityPool"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/demo_iot_opensearch_role"
+   }
+  },
+  "DemoUserPool1AB98549": {
+   "Type": "AWS::Cognito::UserPool",
+   "Properties": {
+    "AccountRecoverySetting": {
+     "RecoveryMechanisms": [
+      {
+       "Name": "verified_phone_number",
+       "Priority": 1
+      },
+      {
+       "Name": "verified_email",
+       "Priority": 2
+      }
+     ]
+    },
+    "AdminCreateUserConfig": {
+     "AllowAdminCreateUserOnly": true
+    },
+    "EmailVerificationMessage": "The verification code to your new account is {####}",
+    "EmailVerificationSubject": "Verify your new account",
+    "SmsVerificationMessage": "The verification code to your new account is {####}",
+    "VerificationMessageTemplate": {
+     "DefaultEmailOption": "CONFIRM_WITH_CODE",
+     "EmailMessage": "The verification code to your new account is {####}",
+     "EmailSubject": "Verify your new account",
+     "SmsMessage": "The verification code to your new account is {####}"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/DemoUserPool/Resource"
+   }
+  },
+  "DemoUserPooliotdemodomainEF32B2ED": {
+   "Type": "AWS::Cognito::UserPoolDomain",
+   "Properties": {
+    "Domain": "iot-demo-domain",
+    "UserPoolId": {
+     "Ref": "DemoUserPool1AB98549"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/DemoUserPool/iot-demo-domain/Resource"
+   }
+  },
+  "UserPoolUserCreationCustomResourcePolicy1AE20E41": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "cognito-idp:*",
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "UserPoolUserCreationCustomResourcePolicy1AE20E41",
+    "Roles": [
+     {
+      "Ref": "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/UserPoolUserCreation/CustomResourcePolicy/Resource"
+   }
+  },
+  "UserPoolUserCreation7E76E291": {
+   "Type": "Custom::AWS",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "AWS679f53fac002430cb0da5b7982bd22872D164C4C",
+      "Arn"
+     ]
+    },
+    "Create": {
+     "Fn::Join": [
+      "",
+      [
+       "{\"action\":\"adminCreateUser\",\"service\":\"CognitoIdentityServiceProvider\",\"parameters\":{\"UserPoolId\":\"",
+       {
+        "Ref": "DemoUserPool1AB98549"
+       },
+       "\",\"Username\":\"admin\",\"TemporaryPassword\":\"Admin123!\"},\"physicalResourceId\":{\"id\":\"userpoolcreateid2022-08-25 16:39:08\"}}"
+      ]
+     ]
+    },
+    "InstallLatestAwsSdk": true
+   },
+   "DependsOn": [
+    "UserPoolUserCreationCustomResourcePolicy1AE20E41"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/UserPoolUserCreation/Resource/Default"
+   }
+  },
+  "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/AWS679f53fac002430cb0da5b7982bd2287/ServiceRole/Resource"
+   }
+  },
+  "AWS679f53fac002430cb0da5b7982bd22872D164C4C": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "6dbd112fe448437b3438da4382c72fccbb7d2ee1543db222620d7447fffebc50.zip"
+    },
+    "Role": {
+     "Fn::GetAtt": [
+      "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2",
+      "Arn"
+     ]
+    },
+    "Handler": "index.handler",
+    "Runtime": "nodejs14.x",
+    "Timeout": 120
+   },
+   "DependsOn": [
+    "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/AWS679f53fac002430cb0da5b7982bd2287/Resource",
+    "aws:asset:path": "asset.6dbd112fe448437b3438da4382c72fccbb7d2ee1543db222620d7447fffebc50",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "masterusergroup": {
+   "Type": "AWS::Cognito::UserPoolGroup",
+   "Properties": {
+    "UserPoolId": {
+     "Ref": "DemoUserPool1AB98549"
+    },
+    "GroupName": "master-user-group",
+    "RoleArn": {
+     "Fn::GetAtt": [
+      "demoiotopensearchrole",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "demoiotopensearchrole",
+    "DemoUserPooliotdemodomainEF32B2ED",
+    "DemoUserPool1AB98549"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/master-user-group"
+   }
+  },
+  "CDKmasterusergroupattachement": {
+   "Type": "AWS::Cognito::UserPoolUserToGroupAttachment",
+   "Properties": {
+    "GroupName": "master-user-group",
+    "Username": "admin",
+    "UserPoolId": {
+     "Ref": "DemoUserPool1AB98549"
+    }
+   },
+   "DependsOn": [
+    "DemoUserPooliotdemodomainEF32B2ED",
+    "DemoUserPool1AB98549",
+    "masterusergroup",
+    "UserPoolUserCreationCustomResourcePolicy1AE20E41",
+    "UserPoolUserCreation7E76E291"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/CDK_master_user_group_attachement"
+   }
+  },
+  "CDKCognitoAccessForOpenSearch56BE0308": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "es.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/AmazonOpenSearchServiceCognitoAccess"
+       ]
+      ]
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/CDKCognitoAccessForOpenSearch/Resource"
+   }
+  },
+  "opensearchdemodomain3F2B2C09": {
+   "Type": "AWS::OpenSearchService::Domain",
+   "Properties": {
+    "AdvancedSecurityOptions": {
+     "Enabled": true,
+     "InternalUserDatabaseEnabled": false,
+     "MasterUserOptions": {
+      "MasterUserARN": {
+       "Fn::GetAtt": [
+        "demoiotopensearchrole",
+        "Arn"
+       ]
+      }
+     }
+    },
+    "ClusterConfig": {
+     "DedicatedMasterEnabled": false,
+     "InstanceCount": 3,
+     "InstanceType": "t3.small.search",
+     "ZoneAwarenessEnabled": false
+    },
+    "CognitoOptions": {
+     "Enabled": true,
+     "IdentityPoolId": {
+      "Ref": "DemoIdentityPool"
+     },
+     "RoleArn": {
+      "Fn::GetAtt": [
+       "CDKCognitoAccessForOpenSearch56BE0308",
+       "Arn"
+      ]
+     },
+     "UserPoolId": {
+      "Ref": "DemoUserPool1AB98549"
+     }
+    },
+    "DomainEndpointOptions": {
+     "EnforceHTTPS": true,
+     "TLSSecurityPolicy": "Policy-Min-TLS-1-0-2019-07"
+    },
+    "DomainName": "opensearch-demo-domain",
+    "EBSOptions": {
+     "EBSEnabled": true,
+     "VolumeSize": 10,
+     "VolumeType": "gp2"
+    },
+    "EncryptionAtRestOptions": {
+     "Enabled": true
+    },
+    "EngineVersion": "OpenSearch_1.2",
+    "LogPublishingOptions": {},
+    "NodeToNodeEncryptionOptions": {
+     "Enabled": true
+    }
+   },
+   "DependsOn": [
+    "CDKCognitoAccessForOpenSearch56BE0308",
+    "demoiotopensearchrole",
+    "DemoIdentityPool",
+    "DemoUserPooliotdemodomainEF32B2ED",
+    "DemoUserPool1AB98549"
+   ],
+   "UpdatePolicy": {
+    "EnableVersionUpgrade": true
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/opensearch-demo-domain/Resource"
+   }
+  },
+  "opensearchdemodomainAccessPolicyCustomResourcePolicy53C39E12": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "es:UpdateDomainConfig",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "opensearchdemodomain3F2B2C09",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "opensearchdemodomainAccessPolicyCustomResourcePolicy53C39E12",
+    "Roles": [
+     {
+      "Ref": "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2"
+     }
+    ]
+   },
+   "DependsOn": [
+    "CDKCognitoAccessForOpenSearch56BE0308",
+    "demoiotopensearchrole",
+    "DemoIdentityPool",
+    "DemoUserPooliotdemodomainEF32B2ED",
+    "DemoUserPool1AB98549"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/opensearch-demo-domain/AccessPolicy/CustomResourcePolicy/Resource"
+   }
+  },
+  "opensearchdemodomainAccessPolicy54A708AD": {
+   "Type": "Custom::OpenSearchAccessPolicy",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "AWS679f53fac002430cb0da5b7982bd22872D164C4C",
+      "Arn"
+     ]
+    },
+    "Create": {
+     "Fn::Join": [
+      "",
+      [
+       "{\"action\":\"updateDomainConfig\",\"service\":\"OpenSearch\",\"parameters\":{\"DomainName\":\"",
+       {
+        "Ref": "opensearchdemodomain3F2B2C09"
+       },
+       "\",\"AccessPolicies\":\"{\\\"Statement\\\":[{\\\"Action\\\":\\\"es:ESHttp*\\\",\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"AWS\\\":\\\"*\\\"},\\\"Resource\\\":\\\"",
+       {
+        "Fn::GetAtt": [
+         "opensearchdemodomain3F2B2C09",
+         "Arn"
+        ]
+       },
+       "/*\\\"}],\\\"Version\\\":\\\"2012-10-17\\\"}\"},\"outputPaths\":[\"DomainConfig.AccessPolicies\"],\"physicalResourceId\":{\"id\":\"",
+       {
+        "Ref": "opensearchdemodomain3F2B2C09"
+       },
+       "AccessPolicy\"}}"
+      ]
+     ]
+    },
+    "Update": {
+     "Fn::Join": [
+      "",
+      [
+       "{\"action\":\"updateDomainConfig\",\"service\":\"OpenSearch\",\"parameters\":{\"DomainName\":\"",
+       {
+        "Ref": "opensearchdemodomain3F2B2C09"
+       },
+       "\",\"AccessPolicies\":\"{\\\"Statement\\\":[{\\\"Action\\\":\\\"es:ESHttp*\\\",\\\"Effect\\\":\\\"Allow\\\",\\\"Principal\\\":{\\\"AWS\\\":\\\"*\\\"},\\\"Resource\\\":\\\"",
+       {
+        "Fn::GetAtt": [
+         "opensearchdemodomain3F2B2C09",
+         "Arn"
+        ]
+       },
+       "/*\\\"}],\\\"Version\\\":\\\"2012-10-17\\\"}\"},\"outputPaths\":[\"DomainConfig.AccessPolicies\"],\"physicalResourceId\":{\"id\":\"",
+       {
+        "Ref": "opensearchdemodomain3F2B2C09"
+       },
+       "AccessPolicy\"}}"
+      ]
+     ]
+    },
+    "InstallLatestAwsSdk": true
+   },
+   "DependsOn": [
+    "CDKCognitoAccessForOpenSearch56BE0308",
+    "demoiotopensearchrole",
+    "DemoIdentityPool",
+    "DemoUserPooliotdemodomainEF32B2ED",
+    "DemoUserPool1AB98549",
+    "opensearchdemodomainAccessPolicyCustomResourcePolicy53C39E12"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/opensearch-demo-domain/AccessPolicy/Resource/Default"
+   }
+  },
+  "ClientIdResourceCustomResourcePolicy90E27E2D": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "cognito-idp:ListUserPoolClients",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "DemoUserPool1AB98549",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ClientIdResourceCustomResourcePolicy90E27E2D",
+    "Roles": [
+     {
+      "Ref": "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2"
+     }
+    ]
+   },
+   "DependsOn": [
+    "opensearchdemodomainAccessPolicyCustomResourcePolicy53C39E12",
+    "opensearchdemodomainAccessPolicy54A708AD",
+    "opensearchdemodomain3F2B2C09"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/ClientIdResource/CustomResourcePolicy/Resource"
+   }
+  },
+  "ClientIdResource92C73354": {
+   "Type": "Custom::AWS",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "AWS679f53fac002430cb0da5b7982bd22872D164C4C",
+      "Arn"
+     ]
+    },
+    "Create": {
+     "Fn::Join": [
+      "",
+      [
+       "{\"action\":\"listUserPoolClients\",\"service\":\"CognitoIdentityServiceProvider\",\"parameters\":{\"UserPoolId\":\"",
+       {
+        "Ref": "DemoUserPool1AB98549"
+       },
+       "\"},\"physicalResourceId\":{\"id\":\"ClientId-iot-demo-domain\"}}"
+      ]
+     ]
+    },
+    "InstallLatestAwsSdk": true
+   },
+   "DependsOn": [
+    "ClientIdResourceCustomResourcePolicy90E27E2D",
+    "opensearchdemodomainAccessPolicyCustomResourcePolicy53C39E12",
+    "opensearchdemodomainAccessPolicy54A708AD",
+    "opensearchdemodomain3F2B2C09"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/ClientIdResource/Resource/Default"
+   }
+  },
+  "CDKIdentityPoolAttachment": {
+   "Type": "AWS::Cognito::IdentityPoolRoleAttachment",
+   "Properties": {
+    "IdentityPoolId": {
+     "Ref": "DemoIdentityPool"
+    },
+    "RoleMappings": {
+     "role_mappings_key": {
+      "AmbiguousRoleResolution": "Deny",
+      "IdentityProvider": {
+       "Fn::Join": [
+        "",
+        [
+         "cognito-idp.",
+         {
+          "Ref": "AWS::Region"
+         },
+         ".amazonaws.com/",
+         {
+          "Ref": "DemoUserPool1AB98549"
+         },
+         ":",
+         {
+          "Fn::GetAtt": [
+           "ClientIdResource92C73354",
+           "UserPoolClients.0.ClientId"
+          ]
+         }
+        ]
+       ]
+      },
+      "Type": "Token"
+     }
+    },
+    "Roles": {}
+   },
+   "DependsOn": [
+    "opensearchdemodomainAccessPolicyCustomResourcePolicy53C39E12",
+    "opensearchdemodomainAccessPolicy54A708AD",
+    "opensearchdemodomain3F2B2C09"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/CDKIdentityPoolAttachment"
+   }
+  },
+  "iottoopensearchloggroup76C0C407": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "iot_to_opensearch_log_group",
+    "RetentionInDays": 731
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/iot_to_opensearch_log_group/Resource"
+   }
+  },
+  "iotcloudwatcherrorlogrole640ECAA3": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "iot.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "DependsOn": [
+    "iottoopensearchloggroup76C0C407"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/iot_cloudwatch_error_log_role/Resource"
+   }
+  },
+  "iotcloudwatcherrorlogroleDefaultPolicy51ECCBCB": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:DescribeLogStreams",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "iottoopensearchloggroup76C0C407",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "iotcloudwatcherrorlogroleDefaultPolicy51ECCBCB",
+    "Roles": [
+     {
+      "Ref": "iotcloudwatcherrorlogrole640ECAA3"
+     }
+    ]
+   },
+   "DependsOn": [
+    "iottoopensearchloggroup76C0C407"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/iot_cloudwatch_error_log_role/DefaultPolicy/Resource"
+   }
+  },
+  "demotoopensearchrule": {
+   "Type": "AWS::IoT::TopicRule",
+   "Properties": {
+    "TopicRulePayload": {
+     "Actions": [
+      {
+       "OpenSearch": {
+        "Endpoint": {
+         "Fn::Join": [
+          "",
+          [
+           "https://",
+           {
+            "Fn::GetAtt": [
+             "opensearchdemodomain3F2B2C09",
+             "DomainEndpoint"
+            ]
+           }
+          ]
+         ]
+        },
+        "Id": "${newuuid()}",
+        "Index": "iot",
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "demoiotopensearchrole",
+          "Arn"
+         ]
+        },
+        "Type": "_doc"
+       }
+      }
+     ],
+     "AwsIotSqlVersion": "2016-03-23",
+     "ErrorAction": {
+      "CloudwatchLogs": {
+       "LogGroupName": {
+        "Ref": "iottoopensearchloggroup76C0C407"
+       },
+       "RoleArn": {
+        "Fn::GetAtt": [
+         "iotcloudwatcherrorlogrole640ECAA3",
+         "Arn"
+        ]
+       }
+      }
+     },
+     "Sql": "SELECT *, parse_time(\"YYYY-MM-dd'T'hh:mm:ss\", timestamp()) as Time FROM 'Opensearch_demo'"
+    }
+   },
+   "DependsOn": [
+    "demoiotopensearchrole",
+    "iottoopensearchloggroup76C0C407",
+    "opensearchdemodomainAccessPolicyCustomResourcePolicy53C39E12",
+    "opensearchdemodomainAccessPolicy54A708AD",
+    "opensearchdemodomain3F2B2C09"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/demo_to_opensearch_rule"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/2WRQW/CMAyFfwv3kLH1sDN02jRph6pjZxRSr3i0cVUnQ1XFf5/T0oLYyZ+fZfm95EkniV4tzImXtjguK9zr/tMbe1Qi7XpLpUNPuk+/3XsBzqPvMqJKfTG0A8hg5gleqDbobkf/lbeWQnMrxLqlQV57cXCo5Zy6u5tTBdfpWaGpB29RVxlVaLu4cqGonlVl6n1hJBa6sgJP7jU465GcmkFWJj4rTnaGGTzrdSzS602wR/Abw6CoAcdgWnsQv79oQffXcCPJSSpZ9x9UziknFsvktQhbatDmIRq0gT3VuxaYQmtB7p44HbT8Iqn7VhJPPJiULyslXhyk5Aock2SdP5B7SPSzflwtfhhx2QZ5yxp0PtY/dxFVE/8BAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "OpenSearchPatternStack/CDKMetadata/Default"
+   },
+   "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Conditions": {
+  "CDKMetadataAvailable": {
+   "Fn::Or": [
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "af-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-northwest-1"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "sa-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-2"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-2"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}
