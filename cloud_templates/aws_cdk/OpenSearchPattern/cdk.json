@@ -34,16 +34,19 @@
       "aws",
       "aws-cn"
     ],
-    "topic_sql": "SELECT *, parse_time(\"YYYY-MM-dd'T'hh:mm:ss\", timestamp()) as Time FROM 'IoT_Analytics_demo'",
-    "analytics_channel_name": "demo_iot_channel",
-    "analytics_datastore_name": "demo_iot_datastore",
-    "analytics_dataset_name": "demo_iot_dataset",
-    "analytics_pipeline_name": "demo_iot_pipeline",
-    "analytics_iot_role_name": "demo_iot_iotanalytics_role",
-    "analytics_iot_rule_name": "demo_to_iotanalytics_rule",
-    "channel_storage_type": "service_managed",
-    "datastore_storage_type": "service_managed",
-    "file_format_configuration": "json",
-    "parquet_file_format_schema_columns" : [{"name": "device_id", "type": "string"}]
+    "topic_sql": "SELECT *, parse_time(\"YYYY-MM-dd'T'hh:mm:ss\", timestamp()) as Time FROM 'Opensearch_demo'",
+    "opensearch_domain_name": "opensearch-demo-domain",
+    "opensearch_index_name": "iot",
+    "opensearch_type_name": "_doc",
+    "iot_to_opensearch_rule_name": "demo_to_opensearch_rule",
+    "iot_to_opensearch_role_name": "demo_iot_opensearch_role",
+    "cognito_user_pool_name" : "DemoUserPool",
+    "cognito_identity_pool_name": "DemoIdentityPool",
+    "cognito_user_pool_domain_name": "iot-demo-domain",
+    "cognito_user_username": "admin",
+    "opensearch_domain_capacity_config": { 
+      "opensearch_domain_data_nodes": 3, 
+      "opensearch_domain_data_node_instance_type": "t3.small.search"
+    } 
   }
 }

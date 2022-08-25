@@ -2,11 +2,11 @@ import os
 
 import aws_cdk as cdk
 
-from io_t_analytics_pattern.io_t_analytics_pattern_stack import IoTAnalyticsPatternStack
+from open_search_pattern.open_search_pattern_stack import OpenSearchPatternStack
 
 
 app = cdk.App()
-IoTAnalyticsPatternStack(app, "IoTAnalyticsPatternStack",
+OpenSearchPatternStack(app, "OpenSearchPatternStack",
     # If you don't specify 'env', this stack will be environment-agnostic.
     # Account/Region-dependent features and context lookups will not work,
     # but a single synthesized template can be deployed anywhere.
