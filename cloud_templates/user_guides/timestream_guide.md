@@ -52,7 +52,8 @@ If you are interested in using the CloudFormation templates more than just for d
 3. Just to verify everything is working correctly, list the stacks in your app by running the `cdk ls` command. If you don't see `TimestreamPatternStack`, make sure you are currently in the `TimestreamPattern` directory.
 4. The structure of the files inside `TimestreamPattern` is as below: 
 
-[Image: Screen Shot 2022-08-24 at 4.40.39 PM.png]
+<img src="images/timestream_structure.png" height="350" align="left">
+
 * `timestream_pattern_stack.py`  is the main code of the stack. It is here where the required resources are created. 
 * `tests/unit/test_timestream_pattern_stack.py` is where the unit tests of the stack are written. The unit tests check
     * Right creation of the resources in addition to their properties
@@ -68,7 +69,7 @@ If you are interested in using the CloudFormation templates more than just for d
 4. Set the context parameter values either by changing the `cdk.json` file or by using the command line.
     1. To create a command line context variable, use the **`--context (-c) option`**, as shown in the following example: `$ cdk cdk synth -c bucket_name=mybucket`
     2. To specify the same context variable and value in the `cdk.json` file, use the following code.`
-          { "context": { "bucket_name": "mybucket" }`
+          {"context": { "bucket_name": "mybucket"}`
 5. Run `cdk synth` to emit the synthesized CloudFormation template.
 6. Run `python -m pytest` to run the unit tests. It is the best practice to run the tests before deploying your template to the cloud.
 7. Run `cdk deploy` to deploy the stack to your default AWS account/region.
