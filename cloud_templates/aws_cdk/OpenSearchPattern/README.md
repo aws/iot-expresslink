@@ -140,15 +140,15 @@ An IAM role should be created to grant AWS IoT access to Opensearch. This parame
 Configures the capacity of the cluster such as the instance type and the number of instances.
 <br> __Format__: Your input must be in the following format:
 <br> 
+
 ``` 
+# Do not include "opensearch_domain_master_nodes" and "opensearch_domain_warm_nodes" keys if you do not want them in your cluster's config.
 { 
   "opensearch_domain_data_nodes":  <int>, 
   "opensearch_domain_data_node_instance_type": <string>, 
   "opensearch_domain_master_nodes":  <int>,   
   "opensearch_domain_warm_nodes":  <int>    
 } 
-
-# Do not include "opensearch_domain_master_nodes" and "opensearch_domain_warm_nodes" keys if you do not want them in your cluster's config.
-```
+``` 
 
 Enjoy!
