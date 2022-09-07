@@ -47,7 +47,8 @@ If you are interested in using the CloudFormation templates more than just for d
 3. Just to verify everything is working correctly, list the stacks in your app by running `cdk ls` command. If you don't see `OpensearchPatternStack`, make sure you are currently in `OpenSearchPattern` directory.
 4. The structure of the files inside `OpenSearchPattern` is as below: 
 
-[Image: Screen Shot 2022-08-25 at 12.52.09 PM.png]
+<img src="images/opensearch_structure.png" height="350" align="left">
+
 * `open_search_pattern_stack.py`  is the main code of the stack. It is here where the required resources are created. 
 * `tests/unit/test_open_search_pattern_stack.py` is where the unit tests of the stack is written. The unit tests check
     * Right creation of the resources in addition to their properties
