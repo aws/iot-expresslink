@@ -6,6 +6,11 @@ The common AT Commands can be found at [Programmer's Manual](https://docs.aws.am
 
 Information about AWS IoT ExpressLink and partner's hardware modules can be found at AWS Partner Network's Device Catalog from the [main page](https://aws.amazon.com/iot-expresslink). Module datasheet, Getting Started Guide, and Product Information are also included in the device catalog. 
 
+## User Guides
+
+The user guides can be found under the folder [cloud_templates/user_guides](cloud_templates/user_guides).
+
+
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
