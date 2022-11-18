@@ -8,7 +8,7 @@ Information about AWS IoT ExpressLink and partner's hardware modules can be foun
 
 ## User Guides
 
-The user guides can be found under the folder <cloud_templates\user_guides>.
+The user guides can be found under the folder [cloud_templates/user_guides](cloud_templates/user_guides).
 
 
 ## Security
