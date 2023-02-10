@@ -1,0 +1,20 @@
+(kicad_sch (version 20211123) (generator eeschema)
+
+  (uuid 36aef479-38b1-413a-8933-07af016b669d)
+
+  (paper "A4")
+
+  (lib_symbols
+  )
+
+
+  (text "The only purpose of this project is to generate \na visually appealing 3D model of the \nWaveshare RP2040-Plus module.\n\nhttps://www.waveshare.com/wiki/RP2040-Plus"
+    (at 62.23 113.03 0)
+    (effects (font (size 5 5)) (justify left bottom))
+    (uuid a4fdaecf-6425-400a-9641-39f42a748307)
+  )
+
+  (sheet_instances
+    (path "/" (page "1"))
+  )
+)
