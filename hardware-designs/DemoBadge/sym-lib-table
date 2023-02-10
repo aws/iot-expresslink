@@ -1,0 +1,10 @@
+(sym_lib_table
+  (lib (name "MCU_RaspberryPi_and_Boards")(type "KiCad")(uri "${KIPRJMOD}/components/RP-Pico Libraries/MCU_RaspberryPi_and_Boards.kicad_sym")(options "")(descr ""))
+  (lib (name "Espressif")(type "KiCad")(uri "${KIPRJMOD}/components/espressif-kicad-libraries/libraries/Espressif.kicad_sym")(options "")(descr ""))
+  (lib (name "ER-TFT013-2")(type "KiCad")(uri "${KIPRJMOD}/components/ER-TFT013-2/ER-TFT013-2.kicad_sym")(options "")(descr ""))
+  (lib (name "NT3H2211W0FHKH")(type "KiCad")(uri "${KIPRJMOD}/components/NT3H2211W0FHKH/NT3H2211W0FHKH.kicad_sym")(options "")(descr ""))
+  (lib (name "PTS815")(type "KiCad")(uri "${KIPRJMOD}/components/PTS815/PTS815.kicad_sym")(options "")(descr ""))
+  (lib (name "JS2020")(type "KiCad")(uri "${KIPRJMOD}/components/JS2020/JS2020.kicad_sym")(options "")(descr ""))
+  (lib (name "IN-S32GTLS")(type "KiCad")(uri "${KIPRJMOD}/components/IN-S32GTLS/IN-S32GTLS.kicad_sym")(options "")(descr ""))
+  (lib (name "ALS-PT19-315C_L177_TR8")(type "KiCad")(uri "${KIPRJMOD}/components/ALS-PT19-315C_L177_TR8/ALS-PT19-315C_L177_TR8.kicad_sym")(options "")(descr ""))
+)

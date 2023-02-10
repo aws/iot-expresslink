@@ -10,6 +10,9 @@ Information about AWS IoT ExpressLink and partner's hardware modules can be foun
 
 The user guides can be found under the folder [cloud_templates/user_guides](cloud_templates/user_guides).
 
+## Hardware Designs
+
+The **AWS IoT ExpressLink Demo Badge hardware design**, with full schematics and PCB layout files, is available under the [hardware designs folder](./hardware-designs/).
 
 ## Security
 
