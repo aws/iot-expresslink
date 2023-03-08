@@ -68,6 +68,7 @@ The **AWS IoT ExpressLink Demo Badge hardware design**, with full schematics and
  Episode 13 | 2022-06-07 | https://www.twitch.tv/aws/video/1532015794 | Lucio, Amit                      | Infineon |
  Episode 14 | 2022-06-14 | https://www.twitch.tv/aws/video/1532016601 | Lucio, Mike                      |          |
  Episode 15 | 2022-06-21 | https://www.twitch.tv/aws/video/1532017442 | Lucio, Steve, Magnus, Amey, Dave | All      |
+ Episode 16 | 2022-11-22 | https://www.twitch.tv/aws/video/1690204748 | Lucio, Jefferson, Elleson, Shimis| Realtek |
 
 ## YouTube Videos
 
