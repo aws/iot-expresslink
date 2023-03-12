@@ -14,6 +14,18 @@ Information about AWS IoT ExpressLink and partner's hardware modules can be foun
 * [AWS IoT ExpressLink Getting Started Guide](https://docs.aws.amazon.com/iot-expresslink/latest/gettingstartedguide/elgsg.html)
 * [AWS IoT ExpressLink Onboarding-by-Claim Customer/OEM Guide](https://docs.aws.amazon.com/iot-expresslink/latest/oemonboardingguide/oemog.html)
 
+## Prototyping SDK libraries
+
+### Python, CircuitPython, MicroPython
+
+For Python, including CircuitPython, MicroPython, and standard Python on Linux, macOS, and Windows:
+https://github.com/awslabs/aws-iot-expresslink-library-python
+
+### Arduino
+
+For Arduino and all all microcontrollers that support the Arduino platform:
+https://github.com/awslabs/aws-iot-expresslink-library-arduino
+
 ## Web Resources
 
 * [AWS IoT ExpressLink product page](https://aws.amazon.com/iot-expresslink/?nc=sn&loc=1)
@@ -34,6 +46,9 @@ The user guides can be found under the folder [cloud_templates/user_guides](clou
 ## Hands-On Workshops and Resources
 
 The **AWS IoT ExpressLink Demo Badge Workshop** is available at https://catalog.workshops.aws/aws-iot-expresslink-demo-badge/. This workshop ran as *IOT207-R* on November 28, and as *IOT207-R* on December 2, at AWS re:Invent 2022.
+
+The *Advanced Lab Modules* of the AWS re:Invent 2022 workshop used a Python library to quickly prototype an integration with AWS IoT ExpressLink using Python. The evolution of this early library is now available in this GitHub repository:
+[awslabs/aws-iot-expresslink-library-python](https://github.com/awslabs/aws-iot-expresslink-library-python)
 
 ## Hardware Designs
 
