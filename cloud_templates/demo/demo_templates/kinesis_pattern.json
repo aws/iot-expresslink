@@ -11,6 +11,15 @@
     ],
     "VersioningConfiguration": {
      "Status": "Enabled"
+    },
+    "BucketEncryption" : {
+        "ServerSideEncryptionConfiguration" : [
+            {
+                "ServerSideEncryptionByDefault" : {
+                    "SSEAlgorithm" : "AES256"
+                }
+            }
+        ]
     }
    },
    "UpdateReplacePolicy": "Delete",

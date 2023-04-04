@@ -62,7 +62,7 @@ If you are interested in using the CloudFormation templates more than just for d
 2. Run `python -m pip install -r requirements.txt` and `python -m pip install -r requirements.txt` to install the dependencies.
 3. Go through the `README.md` file to learn about the context parameters that need to be set by you prior to deployment.
 4. Set the context parameter values either by changing `cdk.json` file or by using the command line.
-    1. To create a command line context variable, use the **`—-context (-c) option`**, as shown in the following example: `$ cdk cdk synth -c bucket_name=mybucket`
+    1. To create a command line context variable, use the **`—-context (-c) option`**, as shown in the following example: `$ cdk synth -c bucket_name=mybucket`
     2. To specify the same context variable and value in the `cdk.json` file, use the following code.`
           {"context": { "bucket_name": "mybucket"}`
 5. Run `cdk synth` to emit the synthesized CloudFormation template.
