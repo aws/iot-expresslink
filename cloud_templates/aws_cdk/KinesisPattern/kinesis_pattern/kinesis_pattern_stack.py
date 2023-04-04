@@ -50,7 +50,7 @@ class KinesisPatternStack(Stack):
         self.performInputValidation()
 
         # Create a bucket for as delivery stream's destination 
-        bucket = s3.Bucket(self, self.kinesis_destination_bucket_name, versioned=True, removal_policy=cdk.RemovalPolicy.DESTROY, auto_delete_objects=True)
+        bucket = s3.Bucket(self, self.kinesis_destination_bucket_name, versioned=True, removal_policy=cdk.RemovalPolicy.DESTROY, auto_delete_objects=True, encryption=s3.BucketEncryption.S3_MANAGED)
 
         # Creating a role for the delivery stream 
         firehose_role = iam.Role(self, self.kinesis_delivery_stream_role_name, assumed_by=iam.ServicePrincipal("firehose.amazonaws.com"))
