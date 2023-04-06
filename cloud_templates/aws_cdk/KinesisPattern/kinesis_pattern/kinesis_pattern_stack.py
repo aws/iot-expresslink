@@ -5,7 +5,8 @@ from aws_cdk import (
     aws_iot as iot,
     aws_iam as iam,
     aws_logs as logs,
-    aws_glue as glue
+    aws_glue as glue,
+    aws_kms as kms
 )
 from constructs import Construct
 import aws_cdk as cdk
@@ -49,8 +50,18 @@ class KinesisPatternStack(Stack):
         # Performing input validation before starting resource creation
         self.performInputValidation()
 
+        # Create an IAM policy
+        kms_policy = iam.PolicyStatement(
+            principals=[iam.AccountRootPrincipal()],
+            actions=["kms:*"],
+            resources=["*"])
+
+        # Create KMS key for admin root user
+        bucketKmsKey = kms.Key(self, id="s3CustomerKmsKey", enable_key_rotation=True)
+        bucketKmsKey.add_to_resource_policy(kms_policy)
+
         # Create a bucket for as delivery stream's destination 
-        bucket = s3.Bucket(self, self.kinesis_destination_bucket_name, versioned=True, removal_policy=cdk.RemovalPolicy.DESTROY, auto_delete_objects=True)
+        bucket = s3.Bucket(self, self.kinesis_destination_bucket_name, versioned=True, removal_policy=cdk.RemovalPolicy.DESTROY, auto_delete_objects=True, encryption=s3.BucketEncryption.KMS, encryption_key=bucketKmsKey)
 
         # Creating a role for the delivery stream 
         firehose_role = iam.Role(self, self.kinesis_delivery_stream_role_name, assumed_by=iam.ServicePrincipal("firehose.amazonaws.com"))
