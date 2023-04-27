@@ -43,6 +43,16 @@ The user guides can be found under the folder [cloud_templates/user_guides](clou
 
 [Realtek's Ameba Z2 AWS IoT ExpressLink Evaluation Kit on GitHub](https://github.com/ambiot/ambz2_aws_iot_expresslink_eval)
 
+### u-blox
+
+[u-blox' USB-NORA-W256AWS AWS IoT ExpressLink Multiradio development kit](https://www.u-blox.com/en/product/usb-nora-w2?legacy=Current#Documentation-&-resources)
+
+[u-blox' SARA-R510AWS module LTE-M AWS IoT ExpressLink module](https://www.u-blox.com/en/product/sara-r510aws-module?legacy=Current#Documentation-&-resources)
+
+### Telit
+
+[Telit's Bravo AWS IoT ExpressLink development kit on GitHub](https://github.com/telit/bravo-aws-expresslink)
+
 ## Hands-On Workshops and Resources
 
 The **AWS IoT ExpressLink Demo Badge Workshop** is available at https://catalog.workshops.aws/aws-iot-expresslink-demo-badge/. This workshop ran as *IOT207-R* on November 28, and as *IOT207-R1* on December 2, at AWS re:Invent 2022.
@@ -94,6 +104,7 @@ The **AWS IoT ExpressLink Demo Badge hardware design**, with full schematics and
 * [Product Showcase: AWS IoT ExpressLink SARA-R5 Starter Kit](https://www.youtube.com/watch?v=nJNYUP0413c)
 * [AIROC™ Cloud Connectivity Manager module & AWS IoT ExpressLink](https://www.youtube.com/watch?v=LEGDyNXPYfc)
 * [Innovation Coffee with AWS IoT ExpressLink](https://www.youtube.com/watch?v=K0saFj-6s6c)
+* [Connecting AWS IoT ExpressLink to an MQTT Broker running on AWS IoT Greengrass](https://www.youtube.com/watch?v=ii59MiFVIDI)
 
 ## Security
 
