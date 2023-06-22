@@ -15,6 +15,12 @@ Information about AWS IoT ExpressLink and partner's hardware modules can be foun
 * [AWS IoT ExpressLink Onboarding-by-Claim Customer/OEM Guide](https://docs.aws.amazon.com/iot-expresslink/latest/oemonboardingguide/oemog.html)
 
 ## Prototyping SDK libraries
+### C libraries
+ExpressLink drivers and examples written in C for different MCU platforms.
+#### STM32
+CMSIS pack for ExpressLink driver and examples, integrated with STM32CubeMX, the native configuration and code generation tool from STMicroelectronics.
+The combination enables developers to quickly and easily create applications that connect to AWS IoT Core using ExpressLink modules with various STM32 MCUs.
+https://github.com/stm32-hotspot/I-CUBE-ExpressLink
 
 ### Python, CircuitPython, MicroPython
 
